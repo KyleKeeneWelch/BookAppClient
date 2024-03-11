@@ -7,6 +7,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "../api/axios";
 import { Link, useNavigate } from "react-router-dom";
+import Footer from "./Footer";
 
 const NAME_REGEX = /^(?=.{1,50}$)[a-z]+(?:['_.\s][a-z]+)*$/i;
 const USERNAME_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
@@ -55,36 +56,26 @@ const Register = () => {
 
   useEffect(() => {
     const result = NAME_REGEX.test(firstName);
-    console.log(result);
-    console.log(firstName);
     setValidFirstName(result);
   }, [firstName]);
 
   useEffect(() => {
     const result = NAME_REGEX.test(lastName);
-    console.log(result);
-    console.log(lastName);
     setValidLastName(result);
   }, [lastName]);
 
   useEffect(() => {
     const result = USERNAME_REGEX.test(username);
-    console.log(result);
-    console.log(username);
     setValidUsername(result);
   }, [username]);
 
   useEffect(() => {
     const result = EMAIL_REGEX.test(email);
-    console.log(result);
-    console.log(email);
     setValidEmail(result);
   }, [email]);
 
   useEffect(() => {
     const result = PWD_REGEX.test(pwd);
-    console.log(result);
-    console.log(pwd);
     setValidPwd(result);
     const match = pwd === matchPwd;
     setValidMatch(match);
@@ -124,9 +115,14 @@ const Register = () => {
         }
       );
       navigate("/login");
-      // clear input fields
+      setFirstName("");
+      setLastName("");
+      setUsername("");
+      setEmail("");
+      setPwd("");
+      setMatchPwd("");
     } catch (err) {
-      console.log(err);
+      console.error(err);
       if (!err?.response) {
         setErrMsg("No Server Response");
       } else if (err.response?.status === 409) {
@@ -396,6 +392,7 @@ const Register = () => {
           <Link to="/login">Sign In</Link>
         </span>
       </p>
+      <Footer />
     </section>
   );
 };

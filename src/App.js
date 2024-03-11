@@ -10,6 +10,7 @@ import Register from "./components/Register";
 import RequireAuth from "./components/RequireAuth";
 import Review from "./components/Review";
 import CreateReview from "./components/CreateReview";
+import UpdateReview from "./components/UpdateReview";
 import Unauthorized from "./components/Unauthorized";
 import { Routes, Route } from "react-router-dom";
 
@@ -27,11 +28,11 @@ function App() {
           <Route element={<RequireAuth />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="account" element={<Account />} />
-            {/* Find a way to provide id for book */}
-            <Route path="books/:bookId" element={<Book />} />
+            <Route path="book/:bookId" element={<Book />} />
             <Route path="books" element={<Books />} />
-            {/* Find a way to provide id for book */}
-            <Route path="reviews/:reviewId" element={<Review />} />
+            <Route path="books/:search" element={<Books />} />
+            <Route path="review/:reviewId" element={<Review />} />
+            <Route path="review/:reviewId/update" element={<UpdateReview />} />
             <Route path="reviews/create" element={<CreateReview />} />
           </Route>
         </Route>

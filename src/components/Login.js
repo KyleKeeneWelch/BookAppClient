@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import Footer from "./Footer";
 
 import axios from "../api/axios";
 const LOGIN_URL = "/auth/login";
@@ -39,14 +40,13 @@ const Login = () => {
           withCredentials: true,
         }
       );
-      console.log(JSON.stringify(response?.data));
       const accessToken = response?.data?.accessToken;
       setAuth({ email, pwd, accessToken });
       setEmail("");
       setPwd("");
       navigate(from, { replace: true });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       if (!err?.response) {
         setErrMsg("No Server Response");
       } else if (err.response?.status === 400) {
@@ -56,7 +56,6 @@ const Login = () => {
       } else {
         setErrMsg("Login Failed");
       }
-      errRef.current.focus();
     }
   };
 
@@ -114,6 +113,7 @@ const Login = () => {
           <Link to="/register">Sign Up</Link>
         </span>
       </p>
+      <Footer />
     </section>
   );
 };
