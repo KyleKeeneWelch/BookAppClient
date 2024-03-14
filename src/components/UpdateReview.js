@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Navbar from "./Navbar";
 import Footer from "./FooterFull";
 import axios from "../api/axios";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const TITLE_MAX = 200;
 const BODY_MAX = 5000;
@@ -19,7 +20,6 @@ const CreateReview = () => {
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
   const titleRef = useRef();
   const bodyRef = useRef();
   const ratingRef = useRef();
@@ -44,12 +44,14 @@ const CreateReview = () => {
 
   const [errMsg, setErrMsg] = useState("");
 
+  // Focus on first field when review loaded
   useEffect(() => {
     if (review) {
       titleRef.current.focus();
     }
   }, [review]);
 
+  // Test input in real time
   useEffect(() => {
     setValidTitle(title.length <= TITLE_MAX && title.length > 0);
   }, [title]);
@@ -62,10 +64,12 @@ const CreateReview = () => {
     setValidRating(rating <= RATING_MAX && rating > 0);
   }, [rating]);
 
+  // Get rid of error once acknowledged
   useEffect(() => {
     setErrMsg("");
   }, [book, title, body, rating]);
 
+  // Get review to display
   useEffect(() => {
     if (!reviewId) {
       return setErrMsg("Review ID not provided");
@@ -96,14 +100,16 @@ const CreateReview = () => {
     getReview();
   }, [reviewId]);
 
+  // Navigate back to review page on cancel
   const handleCancel = () => {
-    navigate(from, { replace: true });
+    navigate(`/review/${reviewId}` || "/", { replace: true });
   };
 
+  // Handle updating review
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // if button enabled with JS hack
+    // If button enabled with JS hack
     const v1 = title.length <= TITLE_MAX && title.length > 0;
     const v2 = body.length <= BODY_MAX && body.length > 0;
     const v3 = rating <= RATING_MAX && rating > 0;
@@ -115,8 +121,8 @@ const CreateReview = () => {
 
     const UPDATE_REVIEW_URL = `/reviews/${review._id}`;
 
-    // Update review
     try {
+      // Update review
       await axiosPrivate.put(
         UPDATE_REVIEW_URL,
         JSON.stringify({
@@ -133,6 +139,7 @@ const CreateReview = () => {
         }
       );
 
+      // Navigate to review page
       navigate(`/review/${review._id}`);
     } catch (err) {
       if (!err?.response) {
@@ -148,151 +155,166 @@ const CreateReview = () => {
   };
 
   return (
-    <section>
+    <>
       <Navbar />
-      <p
-        ref={errRef}
-        className={errMsg ? "errmsg" : "offscreen"}
-        aria-live="assertive"
-      >
-        {errMsg}
-      </p>
-      <h1>Update Review</h1>
-      {review ? (
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="book">Book</label>
-          <input
-            type="text"
-            id="book"
-            autoComplete="off"
-            required
-            aria-invalid="false"
-            value={review.book.title}
-            disabled
-          />
-
-          <label htmlFor="title">
-            Title:
-            <FontAwesomeIcon
-              icon={faCheck}
-              className={validTitle ? "valid" : "hide"}
+      <section className="updateReviewContainer">
+        <p
+          ref={errRef}
+          className={errMsg ? "errmsg" : "offscreen"}
+          aria-live="assertive"
+        >
+          {errMsg}
+        </p>
+        <h1>Update Review</h1>
+        {review ? (
+          <form onSubmit={handleSubmit}>
+            <label htmlFor="book">Book</label>
+            <input
+              type="text"
+              id="book"
+              autoComplete="off"
+              required
+              aria-invalid="false"
+              value={review.book.title}
+              disabled
             />
-            <FontAwesomeIcon
-              icon={faTimes}
-              className={validTitle || !title ? "hide" : "invalid"}
+
+            <label htmlFor="title">
+              Title:
+              <FontAwesomeIcon
+                icon={faCheck}
+                className={validTitle ? "valid" : "hide"}
+              />
+              <FontAwesomeIcon
+                icon={faTimes}
+                className={validTitle || !title ? "hide" : "invalid"}
+              />
+            </label>
+            <input
+              type="text"
+              id="title"
+              ref={titleRef}
+              autoComplete="off"
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              aria-invalid={validTitle ? "false" : "true"}
+              aria-describedby="titleNote"
+              onFocus={() => setTitleFocus(true)}
+              onBlur={() => setTitleFocus(false)}
+              value={title}
             />
-          </label>
-          <input
-            type="text"
-            id="title"
-            ref={titleRef}
-            autoComplete="off"
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            aria-invalid={validTitle ? "false" : "true"}
-            aria-describedby="titleNote"
-            onFocus={() => setTitleFocus(true)}
-            onBlur={() => setTitleFocus(false)}
-            value={title}
-          />
 
-          <p
-            id="titleNote"
-            className={
-              titleFocus && title && !validTitle ? "instructions" : "offscreen"
-            }
-          >
-            <FontAwesomeIcon icon={faInfoCircle} />
-            Title is required and can have up to 200 characters.
-          </p>
+            <p
+              id="titleNote"
+              className={
+                titleFocus && title && !validTitle
+                  ? "instructions"
+                  : "offscreen"
+              }
+            >
+              <FontAwesomeIcon icon={faInfoCircle} />
+              Title is required and can have up to 200 characters.
+            </p>
 
-          <label htmlFor="body">
-            Body:
-            <FontAwesomeIcon
-              icon={faCheck}
-              className={validBody ? "valid" : "hide"}
+            <label htmlFor="body">
+              Body:
+              <FontAwesomeIcon
+                icon={faCheck}
+                className={validBody ? "valid" : "hide"}
+              />
+              <FontAwesomeIcon
+                icon={faTimes}
+                className={validBody || !body ? "hide" : "invalid"}
+              />
+            </label>
+            <textarea
+              id="body"
+              ref={bodyRef}
+              autoComplete="off"
+              onChange={(e) => setBody(e.target.value)}
+              required
+              aria-invalid={validBody ? "false" : "true"}
+              aria-describedby="bodyNote"
+              onFocus={() => setBodyFocus(true)}
+              onBlur={() => setBodyFocus(false)}
+              value={body}
+            ></textarea>
+
+            <p
+              id="bodyNote"
+              className={
+                bodyFocus && body && !validBody ? "instructions" : "offscreen"
+              }
+            >
+              <FontAwesomeIcon icon={faInfoCircle} />
+              Body is required with a maximum of 5000 characters.
+            </p>
+
+            <label htmlFor="rating">
+              Rating:
+              <FontAwesomeIcon
+                icon={faCheck}
+                className={validRating ? "valid" : "hide"}
+              />
+              <FontAwesomeIcon
+                icon={faTimes}
+                className={validRating || !rating ? "hide" : "invalid"}
+              />
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              id="rating"
+              ref={ratingRef}
+              autoComplete="off"
+              onChange={(e) => setRating(e.target.value)}
+              required
+              aria-invalid={validRating ? "false" : "true"}
+              aria-describedby="ratingNote"
+              onFocus={() => setRatingFocus(true)}
+              onBlur={() => setRatingFocus(false)}
+              value={rating}
             />
-            <FontAwesomeIcon
-              icon={faTimes}
-              className={validBody || !body ? "hide" : "invalid"}
+
+            <p
+              id="ratingNote"
+              className={
+                ratingFocus && rating && !validRating
+                  ? "instructions"
+                  : "offscreen"
+              }
+            >
+              <FontAwesomeIcon icon={faInfoCircle} />
+              Rating is required and must be between 0 and 5.
+            </p>
+
+            <div>
+              <button type="button" onClick={handleCancel}>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={
+                  !validTitle || !validBody || !validRating ? true : false
+                }
+              >
+                Submit
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="loadingContainer">
+            <ClipLoader
+              color="var(--color-main)"
+              loading={true}
+              size={150}
+              aria-label="Loading Spinner"
             />
-          </label>
-          <textarea
-            id="body"
-            ref={bodyRef}
-            autoComplete="off"
-            onChange={(e) => setBody(e.target.value)}
-            required
-            aria-invalid={validBody ? "false" : "true"}
-            aria-describedby="bodyNote"
-            onFocus={() => setBodyFocus(true)}
-            onBlur={() => setBodyFocus(false)}
-            value={body}
-          ></textarea>
-
-          <p
-            id="bodyNote"
-            className={
-              bodyFocus && body && !validBody ? "instructions" : "offscreen"
-            }
-          >
-            <FontAwesomeIcon icon={faInfoCircle} />
-            Body is required with a maximum of 5000 characters.
-          </p>
-
-          <label htmlFor="rating">
-            Rating:
-            <FontAwesomeIcon
-              icon={faCheck}
-              className={validRating ? "valid" : "hide"}
-            />
-            <FontAwesomeIcon
-              icon={faTimes}
-              className={validRating || !rating ? "hide" : "invalid"}
-            />
-          </label>
-          <input
-            type="number"
-            step="0.1"
-            id="rating"
-            ref={ratingRef}
-            autoComplete="off"
-            onChange={(e) => setRating(e.target.value)}
-            required
-            aria-invalid={validRating ? "false" : "true"}
-            aria-describedby="ratingNote"
-            onFocus={() => setRatingFocus(true)}
-            onBlur={() => setRatingFocus(false)}
-            value={rating}
-          />
-
-          <p
-            id="ratingNote"
-            className={
-              ratingFocus && rating && !validRating
-                ? "instructions"
-                : "offscreen"
-            }
-          >
-            <FontAwesomeIcon icon={faInfoCircle} />
-            Rating is required and must be between 0 and 5.
-          </p>
-
-          <button type="button" onClick={handleCancel}>
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={!validTitle || !validBody || !validRating ? true : false}
-          >
-            Submit
-          </button>
-        </form>
-      ) : (
-        <p>Loading...</p>
-      )}
+          </div>
+        )}
+      </section>
       <Footer />
-    </section>
+    </>
   );
 };
 

@@ -17,13 +17,15 @@ const Books = () => {
   const [hasNext, setHasNext] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const LIMIT = 10;
+  const LIMIT = 20;
 
+  // Get paginated books
   useEffect(() => {
     const BOOKS_URL = `/books?page=${page}&limit=${LIMIT}&search=${search}`;
 
     const getBooks = async () => {
       try {
+        // Get books and assign whether current selection has a next and previous page
         const response = await axios.get(BOOKS_URL);
         response.data?.previous ? setHasPrevious(true) : setHasPrevious(false);
         response.data?.next ? setHasNext(true) : setHasNext(false);
@@ -39,34 +41,45 @@ const Books = () => {
   }, [search, page]);
 
   return (
-    <section>
+    <>
       <Navbar />
-      <h1>Books</h1>
-      {books?.length ? (
-        books.map((book, i) => (
-          <div key={i}>
-            <Link to={`../book/${book._id}`}>
-              <img src={book.thumbnail} alt="Book Thumbnail" />
-              <h3>{book?.title}</h3>
-            </Link>
+      <section className="booksContainer">
+        <br />
+        <h1>Books</h1>
+        <div>
+          {books?.length ? (
+            books.map((book, i) => (
+              <div key={i}>
+                <Link to={`../book/${book._id}`}>
+                  <img src={book.thumbnail} alt="Book Thumbnail" />
+                  <h3>{book?.title}</h3>
+                </Link>
+              </div>
+            ))
+          ) : (
+            <p>No Results</p>
+          )}
+        </div>
+        <br />
+        <div>
+          <p>Page {page}</p>
+          <br />
+          <div>
+            {hasPrevious && (
+              <button onClick={() => setPage(page - 1)}>
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
+            )}
+            {hasNext && books?.length > 0 && (
+              <button onClick={() => setPage(page + 1)}>
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
+            )}
           </div>
-        ))
-      ) : (
-        <p>No Results</p>
-      )}
-
-      {hasPrevious && (
-        <button onClick={() => setPage(page - 1)}>
-          <FontAwesomeIcon icon={faChevronLeft} />
-        </button>
-      )}
-      {hasNext && books?.length > 0 && (
-        <button onClick={() => setPage(page + 1)}>
-          <FontAwesomeIcon icon={faChevronRight} />
-        </button>
-      )}
+        </div>
+      </section>
       <Footer />
-    </section>
+    </>
   );
 };
 

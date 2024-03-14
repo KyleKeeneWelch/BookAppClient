@@ -51,6 +51,7 @@ const Review = () => {
   const location = useLocation();
   const { auth } = useAuth();
 
+  // Test input in real time
   useEffect(() => {
     setValidCreateComment(
       createComment.length <= COMMENT_MAX && createComment.length > 0
@@ -63,10 +64,12 @@ const Review = () => {
     );
   }, [updateComment]);
 
+  // Get rid of error when acknowledged
   useEffect(() => {
     setErrMsg("");
   }, [createComment, updateComment]);
 
+  // Get review to display
   useEffect(() => {
     if (!reviewId) {
       return setErrMsg("Review ID not provided");
@@ -76,6 +79,7 @@ const Review = () => {
 
     const getReview = async () => {
       try {
+        // Get review
         const response = await axios.get(REVIEW_URL);
         setReview(response.data);
       } catch (err) {
@@ -92,12 +96,14 @@ const Review = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Get paginated comments to display
   useEffect(() => {
     if (review) {
       const COMMENT_URL = `/reviews/${review._id}/comments?page=${page}&limit=${LIMIT}`;
 
       const getComments = async () => {
         try {
+          // Get comments and assign whether selection has previous and next page
           const response = await axios.get(COMMENT_URL);
           response.data?.previous
             ? setHasPrevious(true)
@@ -118,6 +124,7 @@ const Review = () => {
     }
   }, [review, page, commentsChange]);
 
+  // Handle creating comment
   const handleCreateComment = async (e) => {
     e.preventDefault();
 
@@ -131,6 +138,7 @@ const Review = () => {
     try {
       const CREATE_COMMENT_URL = `/reviews/${review._id}/comments`;
 
+      // Create comment
       await axiosPrivate.post(
         CREATE_COMMENT_URL,
         JSON.stringify({
@@ -157,6 +165,7 @@ const Review = () => {
     }
   };
 
+  // Handle update comment
   const handleUpdateComment = async (e) => {
     e.preventDefault();
 
@@ -168,10 +177,12 @@ const Review = () => {
     }
 
     try {
+      // Each comment assigned id as it is unknown which mapped comment needs to be updated
       const UPDATE_COMMENT_URL = `/reviews/${
         review._id
       }/comments/${e.target.getAttribute("data-comment-id")}`;
 
+      // Update comment
       await axiosPrivate.put(
         UPDATE_COMMENT_URL,
         JSON.stringify({
@@ -199,12 +210,14 @@ const Review = () => {
     }
   };
 
+  // Handle delete comment
   const handleDeleteComment = async (e) => {
     e.preventDefault();
 
     try {
       const DELETE_COMMENT_URL = `/reviews/${review._id}/comments/${showDeleteComment}`;
 
+      // Delete comment
       await axiosPrivate.delete(DELETE_COMMENT_URL, {
         withCredentials: true,
       });
@@ -222,15 +235,18 @@ const Review = () => {
     }
   };
 
+  // Handle delete review
   const handleDeleteReview = async (e) => {
     e.preventDefault();
 
     try {
       const DELETE_REVIEW_URL = `/reviews/${review._id}`;
 
+      // Delete review
       await axiosPrivate.delete(DELETE_REVIEW_URL, {
         withCredentials: true,
       });
+      // Navigate to dashboard
       navigate("/");
     } catch (err) {
       console.error(err);
@@ -245,213 +261,284 @@ const Review = () => {
   };
 
   return (
-    <div>
+    <>
       <Navbar />
-      <p
-        ref={errRef}
-        className={errMsg ? "errmsg" : "offscreen"}
-        aria-live="assertive"
-      >
-        {errMsg}
-      </p>
+      <section className="reviewContainer">
+        <p
+          ref={errRef}
+          className={errMsg ? "errmsg" : "offscreen"}
+          aria-live="assertive"
+        >
+          {errMsg}
+        </p>
 
-      {review ? (
-        <div>
-          <h1>{review.title}</h1>
+        {review ? (
           <div>
-            <p>Created by: {review.user.username}</p>
-            <p>Created At: {convertToDateTimeMed(review.createdAt)}</p>
-            <p>
-              {checkIfDatesEqual(review.createdAt, review.updatedAt)
-                ? ""
-                : `Updated At: ${convertToDateTimeMed(review.updatedAt)}`}
-            </p>
-          </div>
-          {review.user.email === auth.email && (
-            <div>
-              <button>
-                <Link to={`/review/${review._id}/update`}>Update Review</Link>
-              </button>
-              <button onClick={() => setShowDeleteReview(true)}>
-                Delete Review
-              </button>
+            <br />
+            <div className="reviewTop">
+              <div>
+                <div>
+                  <h1>{review.title}</h1>
+                  <h1>{review.rating}</h1>
+                </div>
+                <div>
+                  <p>Created by: {review.user.username}</p>
+                </div>
+                <div>
+                  <small>
+                    Created At: {convertToDateTimeMed(review.createdAt)}
+                  </small>
+                  <small>
+                    {checkIfDatesEqual(review.createdAt, review.updatedAt)
+                      ? ""
+                      : `Updated At: ${convertToDateTimeMed(review.updatedAt)}`}
+                  </small>
+                </div>
+                {review.user.email === auth.email && (
+                  <div>
+                    <button>
+                      <Link to={`/review/${review._id}/update`}>
+                        Update Review
+                      </Link>
+                    </button>
+                    <button onClick={() => setShowDeleteReview(true)}>
+                      Delete Review
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div>
+                <div>
+                  <img src={review.book.thumbnail} alt="Book Thumbnail" />
+                  <h3>{review.book.title}</h3>
+                </div>
+              </div>
             </div>
-          )}
-          <div>
-            <img src={review.book.thumbnail} alt="Book Thumbnail" />
-            <h3>{review.book.title}</h3>
-          </div>
-          <div>
-            <h2>Rating: {review.rating}</h2>
-            <p>{review.body}</p>
-          </div>
-          <div>
-            <h2>Comments</h2>
-            <button onClick={() => setShowCreateComment(!showCreateComment)}>
-              {showCreateComment ? "Cancel" : "Create Comment"}
-            </button>
-            <div className={!showCreateComment ? "offscreen" : undefined}>
-              <form onSubmit={handleCreateComment}>
-                <input
-                  type="text"
-                  id="createComment"
-                  ref={createCommentRef}
-                  autoComplete="off"
-                  onChange={(e) => setCreateComment(e.target.value)}
-                  required
-                  aria-invalid={validCreateComment ? "false" : "true"}
-                  aria-describedby="createCommentNote"
-                  onFocus={() => setCreateCommentFocus(true)}
-                  onBlur={() => setCreateCommentFocus(false)}
-                />
-                <p
-                  id="createCommentNote"
-                  className={
-                    createCommentFocus && createComment && !validCreateComment
-                      ? "instructions"
-                      : "offscreen"
-                  }
-                >
-                  Comment is required and can have up to 500 characters.
-                </p>
+            <br />
+            <div className="reviewBody">
+              <p>{review.body}</p>
+            </div>
+            <br />
+            <div className="reviewComments">
+              <div>
+                <h2>Comments</h2>
                 <button
-                  type="submit"
-                  disabled={!validCreateComment ? true : false}
+                  onClick={() => setShowCreateComment(!showCreateComment)}
                 >
-                  <FontAwesomeIcon icon={faCheck} />
+                  {showCreateComment ? "Cancel" : "Create Comment"}
                 </button>
-              </form>
-            </div>
-            {comments?.length > 0 ? (
-              comments.map((comment, i) => (
-                <div key={i}>
-                  <p>{comment.user.username}</p>
-                  {showUpdateComment === comment._id ? (
-                    <form
-                      onSubmit={handleUpdateComment}
-                      data-comment-id={comment._id}
-                    >
-                      <input
-                        type="text"
-                        id="updateComment"
-                        ref={updateCommentRef}
-                        autoComplete="off"
-                        onChange={(e) => setUpdateComment(e.target.value)}
-                        required
-                        aria-invalid={validUpdateComment ? "false" : "true"}
-                        aria-describedby="updateCommentNote"
-                        onFocus={() => setUpdateCommentFocus(true)}
-                        onBlur={() => setUpdateCommentFocus(false)}
-                        value={updateComment}
-                      />
-                      <p
-                        id="updateCommentNote"
-                        className={
-                          updateCommentFocus &&
-                          updateComment &&
-                          !validUpdateComment
-                            ? "instructions"
-                            : "offscreen"
-                        }
-                      >
-                        Comment is required and can have up to 500 characters.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setShowUpdateComment(false)}
-                      >
-                        <FontAwesomeIcon icon={faX} />
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={!validUpdateComment ? true : false}
-                      >
-                        <FontAwesomeIcon icon={faCheck} />
-                      </button>
-                    </form>
-                  ) : (
-                    <>
-                      <p>
-                        Created At: {convertToDateTimeMed(comment.createdAt)}
-                      </p>
-                      <p>
-                        {checkIfDatesEqual(comment.createdAt, comment.updatedAt)
-                          ? ""
-                          : `Updated At: ${convertToDateTimeMed(
-                              comment.updatedAt
-                            )}`}
-                      </p>
-                      {comment.user.email === auth.email && (
-                        <div>
-                          <button
-                            onClick={() => {
-                              setShowUpdateComment(comment._id);
-                              setUpdateComment(comment.body);
-                            }}
+              </div>
+              <div className={!showCreateComment ? "offscreen" : undefined}>
+                <form onSubmit={handleCreateComment}>
+                  <input
+                    type="text"
+                    id="createComment"
+                    ref={createCommentRef}
+                    autoComplete="off"
+                    onChange={(e) => setCreateComment(e.target.value)}
+                    required
+                    aria-invalid={validCreateComment ? "false" : "true"}
+                    aria-describedby="createCommentNote"
+                    onFocus={() => setCreateCommentFocus(true)}
+                    onBlur={() => setCreateCommentFocus(false)}
+                  />
+                  <p
+                    id="createCommentNote"
+                    className={
+                      createCommentFocus && createComment && !validCreateComment
+                        ? "instructions"
+                        : "offscreen"
+                    }
+                  >
+                    Comment is required and can have up to 500 characters.
+                  </p>
+                  <button
+                    type="submit"
+                    disabled={!validCreateComment ? true : false}
+                  >
+                    <FontAwesomeIcon icon={faCheck} />
+                  </button>
+                </form>
+              </div>
+              <div>
+                {comments?.length > 0 ? (
+                  comments.map((comment, i) => (
+                    <div key={i}>
+                      {showUpdateComment === comment._id ? (
+                        <>
+                          <p>{comment.user.username}</p>
+                          <br />
+                          <form
+                            onSubmit={handleUpdateComment}
+                            data-comment-id={comment._id}
                           >
-                            <FontAwesomeIcon icon={faPen} />
-                          </button>
-                          <button
-                            onClick={() => setShowDeleteComment(comment._id)}
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </button>
-                        </div>
+                            <input
+                              type="text"
+                              id="updateComment"
+                              ref={updateCommentRef}
+                              autoComplete="off"
+                              onChange={(e) => setUpdateComment(e.target.value)}
+                              required
+                              aria-invalid={
+                                validUpdateComment ? "false" : "true"
+                              }
+                              aria-describedby="updateCommentNote"
+                              onFocus={() => setUpdateCommentFocus(true)}
+                              onBlur={() => setUpdateCommentFocus(false)}
+                              value={updateComment}
+                            />
+                            <p
+                              id="updateCommentNote"
+                              className={
+                                updateCommentFocus &&
+                                updateComment &&
+                                !validUpdateComment
+                                  ? "instructions"
+                                  : "offscreen"
+                              }
+                            >
+                              Comment is required and can have up to 500
+                              characters.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setShowUpdateComment(false)}
+                            >
+                              <FontAwesomeIcon icon={faX} />
+                            </button>
+                            <button
+                              type="submit"
+                              disabled={!validUpdateComment ? true : false}
+                            >
+                              <FontAwesomeIcon icon={faCheck} />
+                            </button>
+                          </form>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <div>
+                              <p>{comment.user.username}</p>
+                              {comment.user.email === auth.email && (
+                                <div>
+                                  <button
+                                    onClick={() => {
+                                      setShowUpdateComment(comment._id);
+                                      setUpdateComment(comment.body);
+                                    }}
+                                  >
+                                    <FontAwesomeIcon icon={faPen} />
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      setShowDeleteComment(comment._id)
+                                    }
+                                  >
+                                    <FontAwesomeIcon icon={faTrash} />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <small>
+                                Created At:{" "}
+                                {convertToDateTimeMed(comment.createdAt)}
+                              </small>
+                              <small>
+                                {checkIfDatesEqual(
+                                  comment.createdAt,
+                                  comment.updatedAt
+                                )
+                                  ? ""
+                                  : `Updated At: ${convertToDateTimeMed(
+                                      comment.updatedAt
+                                    )}`}
+                              </small>
+                            </div>
+                          </div>
+                          <br />
+                          <div>
+                            <p>{comment.body}</p>
+                          </div>
+                        </>
                       )}
-                      <p>{comment.body}</p>
-                    </>
+                    </div>
+                  ))
+                ) : (
+                  <p>No comments available. Be the first to the discussion.</p>
+                )}
+              </div>
+              <div>
+                <br />
+                <p>Page {page}</p>
+                <br />
+                <div>
+                  {hasPrevious && (
+                    <button onClick={() => setPage(page - 1)}>
+                      <FontAwesomeIcon icon={faChevronLeft} />
+                    </button>
+                  )}
+                  {hasNext && comments?.length > 0 && (
+                    <button onClick={() => setPage(page + 1)}>
+                      <FontAwesomeIcon icon={faChevronRight} />
+                    </button>
                   )}
                 </div>
-              ))
-            ) : (
-              <p>No comments available. Be the first to the discussion.</p>
-            )}
-
-            {hasPrevious && (
-              <button onClick={() => setPage(page - 1)}>
-                <FontAwesomeIcon icon={faChevronLeft} />
-              </button>
-            )}
-            {hasNext && comments?.length > 0 && (
-              <button onClick={() => setPage(page + 1)}>
-                <FontAwesomeIcon icon={faChevronRight} />
-              </button>
-            )}
+              </div>
+            </div>
           </div>
-        </div>
-      ) : (
-        <p>No Review to display</p>
-      )}
-      {showDeleteComment && (
-        <>
-          <div className="backdrop"></div>
-          <div className="deleteCommentModal">
-            <form onSubmit={handleDeleteComment}>
-              <h2>Are you sure you want to delete this comment?</h2>
-              <button type="button" onClick={() => setShowDeleteComment("")}>
-                Cancel
-              </button>
-              <button type="submit">Delete</button>
-            </form>
-          </div>
-        </>
-      )}
-      {showDeleteReview && (
-        <>
-          <div className="backdrop"></div>
-          <div className="deleteReviewModal">
-            <form onSubmit={handleDeleteReview}>
-              <h2>Are you sure you want to delete this review?</h2>
-              <button type="button" onClick={() => setShowDeleteReview(false)}>
-                Cancel
-              </button>
-              <button type="submit">Delete</button>
-            </form>
-          </div>
-        </>
-      )}
+        ) : (
+          <p>No Review to display</p>
+        )}
+        {showDeleteComment && (
+          <>
+            <div
+              className="backdrop"
+              onClick={() => setShowDeleteComment(false)}
+            ></div>
+            <div className="deleteModal">
+              <form onSubmit={handleDeleteComment}>
+                <h2>Are you sure you want to delete this comment?</h2>
+                <br />
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteComment("")}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit">Delete</button>
+                </div>
+              </form>
+            </div>
+          </>
+        )}
+        {showDeleteReview && (
+          <>
+            <div
+              className="backdrop"
+              onClick={() => setShowDeleteReview(false)}
+            ></div>
+            <div className="deleteModal">
+              <form onSubmit={handleDeleteReview}>
+                <h2>Are you sure you want to delete this review?</h2>
+                <br />
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteReview(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit">Delete</button>
+                </div>
+              </form>
+            </div>
+          </>
+        )}
+      </section>
       <Footer />
-    </div>
+    </>
   );
 };
 

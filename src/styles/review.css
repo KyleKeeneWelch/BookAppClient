@@ -1,0 +1,254 @@
+.reviewContainer {
+    padding-left: 10%;
+    padding-right: 10%;
+
+    & > div:first-of-type {
+        & .reviewTop {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+    
+            & > div:first-of-type {
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-sm);
+
+                & > div:nth-child(1) {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+    
+                    & h1:last-of-type {
+                        border-radius: 9999px;
+                        background-color: var(--color-third);
+                        width: calc(5rem + var(--text-size));
+                        height: calc(5rem + var(--text-size));
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                }
+    
+                & > div:nth-child(3) {
+                    display: flex;
+                    justify-content: flex-start;
+                    gap: var(--spacing-lg);
+                }
+    
+                & > div:nth-child(4) {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: var(--spacing-lg);
+    
+                    & button {
+                        padding-top: var(--spacing-xs);
+                        padding-bottom: var(--spacing-xs);
+                        padding-left: var(--spacing-md);
+                        padding-right: var(--spacing-md);
+    
+                        & a {
+                            text-decoration: none;
+                            color: var(--white);
+                        }
+                    }
+                }
+            }
+    
+            & > div:last-of-type {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+    
+                & div {
+                    border: 1px solid var(--color-main);
+                    border-radius: var(--border-radius);
+                    text-align: center;
+                    background-color: var(--color-third);
+                    box-shadow: var(--box-shadow);
+    
+                    & h3 {
+                        padding: var(--spacing-xs);
+                    }
+                }
+            }
+        }
+
+        & > .reviewBody {
+            border: 1px solid var(--color-main);
+            border-radius: var(--border-radius);
+            background-color: var(--color-third);
+            box-shadow: var(--box-shadow);
+            padding: var(--spacing-lg);
+
+            & p {
+                white-space: pre-line;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+        }
+
+        & > .reviewComments {
+            & > div:nth-child(1) {
+                display: flex;
+                gap: var(--spacing-xl);
+
+                & button {
+                    padding-top: var(--spacing-xs);
+                    padding-bottom: var(--spacing-xs);
+                    padding-left: var(--spacing-md);
+                    padding-right: var(--spacing-md);
+                }
+            }
+
+            & > div:nth-child(2) {
+                width: 100%;
+                padding-top: var(--spacing-sm);
+                padding-bottom: var(--spacing-sm);
+
+                & form {
+                    display: flex;
+                    width: 100%;
+                    gap: var(--spacing-sm);
+
+                    & input {
+                        width: 100%;
+                    }
+
+                    & button {
+                        padding-top: var(--spacing-xs);
+                        padding-bottom: var(--spacing-xs);
+                        padding-left: var(--spacing-md);
+                        padding-right: var(--spacing-md);
+                    }
+                }
+            }
+
+            & > div:nth-child(3) {
+                border: 1px solid var(--color-main);
+                border-radius: var(--border-radius);
+                background-color: var(--color-third);
+                box-shadow: var(--box-shadow);
+                padding: var(--spacing-lg);
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-sm);
+                margin-top: var(--spacing-md);
+
+                & > div {
+                    border: 1px solid var(--color-main);
+                    border-radius: var(--border-radius);
+                    box-shadow: var(--box-shadow);
+                    padding: var(--spacing-sm);
+
+                    & > div:first-of-type {
+                        display: flex;
+                        justify-content: space-between;
+                        gap: var(--spacing-sm);
+
+                        & div {
+                            display: flex;
+                            align-items: center;
+                            gap: var(--spacing-md);
+
+                           
+                        }
+                    }
+
+                    & > div:last-of-type {
+                        padding: var(--spacing-sm);
+                        border: 1px solid var(--color-main);
+                        border-radius: var(--border-radius);
+                        box-shadow: var(--box-shadow);
+                        background-color: var(--color-third);
+
+                        & p {
+                            word-break: break-all;
+                        }
+                    }
+
+                    & button {
+                        padding-top: var(--spacing-xs);
+                        padding-bottom: var(--spacing-xs);
+                        padding-left: var(--spacing-md);
+                        padding-right: var(--spacing-md);
+                    }
+
+                    form {
+                        display: flex;
+                        gap: var(--spacing-sm);
+                        width: 100%;
+
+                        & input {
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+
+            & > div:nth-child(4) {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+
+                & div {
+                    display: flex;
+                    justify-content: center;
+                    gap: var(--spacing-lg);
+
+                    & button {
+                        padding-top: var(--spacing-xs);
+                        padding-bottom: var(--spacing-xs);
+                        padding-left: var(--spacing-md);
+                        padding-right: var(--spacing-md);
+                    }
+                }
+            }
+        }
+    }
+}
+
+.deleteModal {
+    background-color: var(--color-secondary);
+    border: 1px solid var(--color-main);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    width: 400px;
+    position: fixed;
+    z-index: 50;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: var(--box-shadow);
+
+    & form {
+        text-align: center;
+
+        & div {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+
+            & button {
+                padding-top: var(--spacing-xs);
+                padding-bottom: var(--spacing-xs);
+                padding-left: var(--spacing-md);
+                padding-right: var(--spacing-md);
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 700px)  {
+    .reviewTop {
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--spacing-sm);
+
+        & > div:first-of-type {
+            & > div:nth-child(4) {
+                justify-content: center !important;
+            }
+        }
+    }
+}

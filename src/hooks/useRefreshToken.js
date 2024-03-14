@@ -4,13 +4,13 @@ import useAuth from "./useAuth";
 const useRefreshToken = () => {
   const { setAuth } = useAuth();
 
+  // Obtain access token form refresh endpoint which checks for a refresh cookie
   const refresh = async () => {
     const response = await axios.get("/auth/refresh", {
       withCredentials: true,
     });
+    // Set auth context to include the new access token and email
     setAuth((prev) => {
-      console.log(JSON.stringify(prev));
-      console.log(response.data.accessToken);
       return {
         ...prev,
         email: response.data.email,

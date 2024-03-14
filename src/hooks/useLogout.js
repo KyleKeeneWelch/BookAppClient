@@ -4,6 +4,7 @@ import useAuth from "./useAuth";
 const useLogout = () => {
   const { setAuth } = useAuth();
 
+  // Clear the auth context and reach the logout endpoint to delete the cookie
   const logout = async () => {
     setAuth({});
     try {

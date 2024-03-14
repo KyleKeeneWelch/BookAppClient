@@ -1,0 +1,173 @@
+.bookContainer {
+    padding-left: 10%;
+    padding-right: 10%;
+
+    & > div {
+        & .bookTop {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--spacing-md);
+            align-items: center;
+
+            & div:last-of-type {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-lg);
+
+                & button {
+                    padding-top: var(--spacing-xs);
+                    padding-bottom: var(--spacing-xs);
+                    padding-left: var(--spacing-md);
+                    padding-right: var(--spacing-md);
+                    height: min-content;
+
+                    & a {
+                        text-decoration: none;
+                        color: var(--white);
+                    }
+                }
+
+                & h1 {
+                    border-radius: 9999px;
+                    background-color: var(--color-third);
+                    width: calc(5rem + var(--text-size));
+                    height: calc(5rem + var(--text-size));
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+            }
+        }
+
+        & .bookDetails {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: auto auto 40% 50px;
+            gap: var(--spacing-sm);
+            height: 85vh;
+            width: 100%;
+
+            & img {
+                height: auto;
+                width: 100%;
+                border: 1px solid var(--color-main);
+                border-radius: var(--border-radius);
+                box-shadow: var(--box-shadow);
+                grid-column: 2 / 3;
+                grid-row: 1 / -1;
+                align-self: center;
+            }
+
+            & > div:not(:nth-child(4)) {
+                background-color: var(--color-third);
+                padding: var(--spacing-lg);
+                border-radius: var(--border-radius);
+                border: 1px solid var(--color-main);
+                box-shadow: var(--box-shadow);
+                overflow: auto;
+
+                &:nth-child(1) {
+                    grid-column: 1 / 2;
+                    grid-row: 1 / 2;
+                }
+
+                &:nth-child(2) {
+                    grid-column: 1 / 2;
+                    grid-row: 2 / 3;
+                }
+
+                &:nth-child(3) {
+                    grid-column: 1 / 2;
+                    grid-row: 3 / 4;
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-sm);
+
+                    & > div {
+                        border: 1px solid var(--color-main);
+                        border-radius: var(--border-radius);
+                        display: grid;
+                        grid-template-columns: 1fr 1fr 2fr;
+                        grid-template-rows: auto auto 1fr;
+                        padding: var(--spacing-sm);
+                        box-shadow: var(--box-shadow);
+
+                        & > div:nth-of-type(2) {
+                            grid-column: 1 / 2;
+                            grid-row: 1 / 2;
+                        }
+
+                        & > div:nth-last-of-type(1) {
+                            grid-column: 2 / -1;
+                            grid-row: 1 / 2;
+                            display: flex;
+                            justify-content: flex-end;
+                            gap: var(--spacing-sm);
+                        }
+
+                        & p:nth-of-type(1) {
+                            grid-column: 1 / 2;
+                            grid-row: 2 / 3;
+                            padding: var(--spacing-xs)
+                        }
+
+                        & p:nth-of-type(2) {
+                            grid-column: 2 / 3;
+                            grid-row: 2 / 3;
+                            padding: var(--spacing-xs)
+                        }
+
+                        & p:nth-of-type(3) {
+                            grid-column: 1 / -1;
+                            grid-row: 3 / 4;
+                            padding: var(--spacing-xs);
+                            border: 1px solid var(--color-main);
+                            background-color: var(--color-third);
+                            border-radius: var(--border-radius);
+                            word-break: break-all;
+                        }
+                    }
+                }
+            }
+
+            & > div:nth-child(4) {
+                grid-column: 1 / 2;
+                grid-row: 4 / 5;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: var(--spacing-lg);
+
+                & div {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: var(--spacing-md);
+                }
+
+                & button {
+                    padding-left: var(--spacing-md);
+                    padding-right: var(--spacing-md);
+                    padding-top: var(--spacing-xs);
+                    padding-bottom: var(--spacing-xs);
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 1100px)  {
+    .bookDetails {
+        display: flex !important;
+        flex-direction: column;
+        height: 100% !important;
+
+        & > div {
+            height: 100%;
+        }
+
+        & img {
+            width: 50% !important;
+        }
+    }
+}

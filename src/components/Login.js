@@ -20,18 +20,22 @@ const Login = () => {
   const [pwd, setPwd] = useState("");
   const [errMsg, setErrMsg] = useState("");
 
+  // Focus on first field
   useEffect(() => {
     emailRef.current.focus();
   }, []);
 
+  // Get rid of error message once acknowledged
   useEffect(() => {
     setErrMsg("");
   }, [email, pwd]);
 
+  // Handle login
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      // Login
       const response = await axios.post(
         LOGIN_URL,
         JSON.stringify({ email, password: pwd }),
@@ -40,10 +44,18 @@ const Login = () => {
           withCredentials: true,
         }
       );
+      // Obtain access token and cookie. Token and other important information stored securely in auth context
       const accessToken = response?.data?.accessToken;
-      setAuth({ email, pwd, accessToken });
+      setAuth({
+        email,
+        pwd,
+        accessToken,
+        fontIncrease: false,
+        darkMode: false,
+      });
       setEmail("");
       setPwd("");
+      // Navigate to previous location if exists (which could have blocked entry due to the need to reauthenticate) or dashboard
       navigate(from, { replace: true });
     } catch (err) {
       console.error(err);
@@ -59,62 +71,72 @@ const Login = () => {
     }
   };
 
+  // Toggle whether to enable persistant login
   const togglePersist = () => {
     setPersist((prev) => !prev);
   };
 
+  // Store persist in local storage
   useEffect(() => {
     localStorage.setItem("persist", persist);
   }, [persist]);
 
   return (
-    <section>
-      <p
-        ref={errRef}
-        className={errMsg ? "errmsg" : "offscreen"}
-        aria-live="assertive"
-      >
-        {errMsg}
-      </p>
-      <h1>Sign In</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          ref={emailRef}
-          autoComplete="off"
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
-          required
-        />
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          onChange={(e) => setPwd(e.target.value)}
-          value={pwd}
-          required
-        />
-        <button>Sign In</button>
-        <div className="persistCheck">
-          <input
-            type="checkbox"
-            id="persist"
-            onChange={togglePersist}
-            checked={persist}
-          />
-          <label htmlFor="persist">Trust This Device</label>
-        </div>
-      </form>
-      <p>
-        Need An Account? <br />
-        <span className="line">
+    <>
+      <section className="loginContainer">
+        <p
+          ref={errRef}
+          className={errMsg ? "errmsg" : "offscreen"}
+          aria-live="assertive"
+        >
+          {errMsg}
+        </p>
+        <h1>Sign In</h1>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email">Email:</label>
+            <br />
+            <input
+              type="email"
+              id="email"
+              ref={emailRef}
+              autoComplete="off"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="password">Password:</label>
+            <br />
+            <input
+              type="password"
+              id="password"
+              onChange={(e) => setPwd(e.target.value)}
+              value={pwd}
+              required
+            />
+          </div>
+          <button>Sign In</button>
+          <div className="persistCheck">
+            <input
+              type="checkbox"
+              id="persist"
+              onChange={togglePersist}
+              checked={persist}
+            />
+            <label htmlFor="persist">Trust This Device</label>
+          </div>
+        </form>
+        <br />
+        <p>
+          Need An Account?
+          <br />
           <Link to="/register">Sign Up</Link>
-        </span>
-      </p>
+        </p>
+      </section>
       <Footer />
-    </section>
+    </>
   );
 };
 

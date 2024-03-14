@@ -23,7 +23,7 @@ function App() {
         <Route path="register" element={<Register />} />
         <Route path="unauthorized" element={<Unauthorized />} />
 
-        {/* we want to protect these routes */}
+        {/* protected routes */}
         <Route element={<PersistLogin />}>
           <Route element={<RequireAuth />}>
             <Route path="/" element={<Dashboard />} />

@@ -8,6 +8,7 @@ const useAxiosPrivate = () => {
   const { auth } = useAuth();
 
   useEffect(() => {
+    // Request interceptor. Assign authorization header if doesn't currently exist.
     const requestIntercept = axiosPrivate.interceptors.request.use(
       (config) => {
         if (!config.headers["Authorization"]) {
@@ -18,6 +19,7 @@ const useAxiosPrivate = () => {
       (error) => Promise.reject(error)
     );
 
+    // Response interceptor. Upon first failure as access token is now invalid, obtain new refresh token and try again.
     const responseIntercept = axiosPrivate.interceptors.response.use(
       (response) => response,
       async (error) => {
